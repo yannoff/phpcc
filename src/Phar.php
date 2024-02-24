@@ -31,7 +31,7 @@ class Phar extends BuiltinPhar
      */
     public function addDirectory(string $directory, string $filter = ''): self
     {
-        $files = $this->find($directory, $filter);
+        $files = Directory::find($directory, $filter);
         array_walk($files, function ($file) { $this->addFileContents($file); });
 
         return $this;
@@ -52,32 +52,5 @@ class Phar extends BuiltinPhar
 
         $contents = $minify ? php_strip_whitespace($filename) : file_get_contents($filename);
         $this[$key] = $contents;
-    }
-
-    /**
-     * Return the full list of files in the directory, optionally filtered by a REGEXP pattern
-     *
-     * @param string  $directory
-     * @param ?string $pattern
-     *
-     * @return array
-     */
-    public function find(string $directory, string $pattern = null): array
-    {
-        $files = [];
-        $root = array_filter(scandir($directory), function ($value) { return !in_array($value, ['.', '..']); });
-
-        foreach ($root as $value) {
-            $path = sprintf('%s/%s', rtrim($directory, '/'), $value);
-            if (is_file($path)) {
-                if (preg_match($pattern ?: '/.*/', $path)) {
-                    $files[] = $path;
-                }
-                continue;
-            }
-            $files = array_merge($files, $this->find($path, $pattern));
-        }
-
-        return $files;
     }
 }
