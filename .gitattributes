@@ -1,0 +1,3 @@
+.git*    export-exclude
+.banner  export-exclude
+build.sh export-exclude

@@ -1,0 +1,16 @@
+#
+# This file was generated automatically by Offenbach
+# @see https://github.com/yannoff/offenbach for details
+#
+name: yannoff/phpcc
+description: 'PHP Code Compiler - Phar executables compiling utility'
+type: project
+license: MIT
+config:
+    sort-packages: true
+autoload:
+    psr-4:
+        Yannoff\PhpCodeCompiler\: src/
+require:
+    php: '>=7.1'
+    yannoff/console: ^2.2
