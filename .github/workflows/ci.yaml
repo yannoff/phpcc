@@ -1,0 +1,59 @@
+# vim: ts=4 sw=4 sts=4 retab
+
+name: Run checks
+
+on:
+    - push
+
+env:
+    COMPOSER_ROOT_VERSION: 2.2.5
+
+jobs:
+    coding-standards:
+        name: Coding standards
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: latest
+                  coverage: none
+                  tools: phpcs
+
+            - name: Check coding standards (PHP_CodeSniffer)
+              run: phpcs ./src
+
+    smoke-test:
+        name: Test compiling command
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-versions:
+                    - 7.1
+                    - 7.2
+                    - 7.3
+                    - 7.4
+                    - 8.0
+                    - 8.1
+                    - 8.2
+                    - 8.3
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install PHP & Offenbach
+              uses: yannoff/offenbach/actions/install@master
+              with:
+                  php-version: ${{ matrix.php-versions }}
+
+            - name: Install dependencies (Offenbach)
+              run: offenbach install
+
+            - name: Pass 1/2 - Compile (try to self-compile)
+              run: php -dphar.readonly=0 bin/compile.php -d src:php -d vendor:php -e bin/compile.php -o bin/cc -b .banner
+
+            - name: Pass 2/2 - Smoke test (launch help command)
+              run: bin/cc --help
