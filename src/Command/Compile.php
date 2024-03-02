@@ -97,11 +97,12 @@ class Compile extends Command
      * Add a single file to the archive builder
      *
      * @param string $file
+     * @param bool   $$minify
      */
-    protected function addFile(string $file)
+    protected function addFile(string $file, bool $minify = true)
     {
         $this->info('+ ' . $file, 'grey');
-        $this->builder->addFile($file);
+        $this->builder->addFile(realpath($file), $file, $minify);
     }
 
     /**
