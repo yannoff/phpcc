@@ -54,8 +54,8 @@ class Compile extends Command
 
         $this
             ->initBuilder($main)
-            ->setNotice($banner)
             ->addDirectories($dirs)
+            ->setNotice($banner)
             ->publish($output)
             ->info('Build complete.')
         ;
@@ -85,9 +85,6 @@ class Compile extends Command
      */
     protected function addDirectory(string $directory, string $extensions = null)
     {
-        $wildcard = $extensions ? "*.$extensions" : 'all';
-        $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files ...");
-
         $filter = ($extensions) ? sprintf('/\.%s$/', $extensions) : '';
         $files = Directory::find($directory, $filter);
 
@@ -115,8 +112,12 @@ class Compile extends Command
     protected function addDirectories(array $dirs): self
     {
         foreach ($dirs as $spec) {
-            list($dir, $ext) = explode(':', $spec);
-            $this->addDirectory($dir, $ext);
+            list($directory, $extensions) = explode(':', $spec);
+
+            $wildcard = $extensions ? "*.$extensions" : 'all';
+            $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files ...");
+
+            $this->addDirectory($directory, $extensions);
         }
 
         return $this;
@@ -135,6 +136,8 @@ class Compile extends Command
             $this->info("Loading banner contents from <strong>$banner</strong> file ...");
             $contents = file_get_contents($banner);
             $header = $this->phpdocize($contents);
+
+            $this->info($header, 'grey');
             $this->builder->setBanner($header);
         }
 
