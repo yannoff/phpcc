@@ -111,22 +111,6 @@ class PharBuilder
     }
 
     /**
-     * Add all files in the directory tree, optionally filtered by extension
-     *
-     * @param string  $directory  The directory to scan for contents
-     * @param ?string $extensions Filter on extension, may be "php" or "(php|phtml)"
-     *
-     * @return self
-     */
-    public function addContentsFromDirectory(string $directory, string $extensions = null): self
-    {
-        $filter = ($extensions) ? sprintf('/\.%s$/', $extensions) : '';
-        $this->archive->addDirectory($directory, $filter);
-
-        return $this;
-    }
-
-    /**
      * Compress files, generate the stub and save PHAR to the output file
      *
      * @param string $output      Path to the final output file
@@ -183,5 +167,19 @@ class PharBuilder
         $lines[] = sprintf('require "phar://%s/%s"; __HALT_COMPILER();', $this->pharname, $main);
 
         return implode(self::EOL, $lines);
+    }
+
+    /**
+     * Add a single file to the archive, optionally minified
+     *
+     * @param string  $file   Path to the file
+     * @param ?string $local  Optional file alias
+     * @param bool    $minify Whether comments/spaces should be removed from contents
+     */
+    public function addFile(string $file, string $local = null, bool $minify = true)
+    {
+        $this->archive->addFileContents($file, $local, $minify);
+
+        return $this;
     }
 }
