@@ -72,6 +72,8 @@ class Compile extends Command
     {
         $this->info('Initializing Phar builder...');
         $this->builder = PharBuilder::create($main);
+        $this->info('Adding stub entrypoint script contents...');
+        $this->addFile($main);
 
         return $this;
     }
