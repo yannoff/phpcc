@@ -37,4 +37,16 @@ class Phar extends BuiltinPhar
         $contents = $minify ? php_strip_whitespace($filename) : file_get_contents($filename);
         $this[$key] = $contents;
     }
+
+    /**
+     * Check whether the given file exists in archive
+     *
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function has(string $file): bool
+    {
+        return $this->offsetExists($file);
+    }
 }

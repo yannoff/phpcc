@@ -15,6 +15,8 @@
 
 namespace Yannoff\PhpCodeCompiler;
 
+use LogicException;
+
 /**
  * Phar archive builder class
  */
@@ -91,8 +93,6 @@ class PharBuilder
         $this->archive = new Phar($this->pharname);
         $this->archive->startBuffering();
 
-        $this->archive->addFileContents($this->main);
-
         return $this;
     }
 
@@ -118,6 +118,11 @@ class PharBuilder
      */
     public function compile(string $output, string $compression = 'GZ')
     {
+        // Check that entrypoint script contents has been added to the archive before proceeding
+        if (!$this->archive->has($this->main)) {
+            throw new LogicException("Main script {$this->main} contents must be added to the archive");
+        }
+
         $c = constant('Phar::' . $compression);
         $this->archive->compressFiles($c);
 
