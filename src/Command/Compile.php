@@ -17,6 +17,7 @@ namespace Yannoff\PhpCodeCompiler\Command;
 
 use Yannoff\Component\Console\Command;
 use Yannoff\Component\Console\Definition\Option;
+use Yannoff\PhpCodeCompiler\Directory;
 use Yannoff\PhpCodeCompiler\PharBuilder;
 
 class Compile extends Command
@@ -76,7 +77,36 @@ class Compile extends Command
     }
 
     /**
-     * Add a list of directory specifications to the Phar builder
+     * Add files found in the directory to the builder, optionally filtered by extension
+     *
+     * @param string  $directory  The directory to scan for contents
+     * @param ?string $extensions Filter on extension, may be "php" or "(php|phtml)"
+     *
+     */
+    protected function addDirectory(string $directory, string $extensions = null)
+    {
+        $wildcard = $extensions ? "*.$extensions" : 'all';
+        $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files ...");
+
+        $filter = ($extensions) ? sprintf('/\.%s$/', $extensions) : '';
+        $files = Directory::find($directory, $filter);
+
+        array_walk($files, function ($file) { $this->addFile($file); });
+    }
+
+    /**
+     * Add a single file to the archive builder
+     *
+     * @param string $file
+     */
+    protected function addFile(string $file)
+    {
+        $this->info('+ ' . $file, 'grey');
+        $this->builder->addFile($file);
+    }
+
+    /**
+     * Add a list of directory specifications to the archive builder
      *
      * @param array $dirs A list of directories in the form "$dir" or "$dir:$extension"
      *
@@ -86,24 +116,14 @@ class Compile extends Command
     {
         foreach ($dirs as $spec) {
             list($dir, $ext) = explode(':', $spec);
-            $wildcard = $ext ? "*.$ext" : 'all';
-            $this->info("Scanning directory <strong>$dir</strong> for <strong>$wildcard</strong> files ...");
-            $this->builder->addContentsFromDirectory($dir, $ext);
+            $this->addDirectory($dir, $ext);
         }
-
-        $this->info(
-            implode("\n", array_map(
-                function ($f) { return sprintf('+ %s', $f); },
-                $this->builder->list()
-            )),
-            'grey'
-        );
 
         return $this;
     }
 
     /**
-     * Add banner file contents to the Phar builder
+     * Add banner file contents to the archive builder
      *
      * @param ?string $banner Path to the banner file
      *

@@ -22,22 +22,6 @@ class Phar extends BuiltinPhar
     public $files = [];
 
     /**
-     * Add the contents of a directory in the archive
-     *
-     * @param string $directory The directory to be included
-     * @param string $filter    Optional filter on file extensions
-     *
-     * @return self
-     */
-    public function addDirectory(string $directory, string $filter = ''): self
-    {
-        $files = Directory::find($directory, $filter);
-        array_walk($files, function ($file) { $this->addFileContents($file); });
-
-        return $this;
-    }
-
-    /**
      * Similar to Phar::addFile(), with optional minifying
      *
      * @param string  $filename
