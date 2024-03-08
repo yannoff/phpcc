@@ -74,6 +74,7 @@ class PharBuilder
      * Visibility is defined private to force using the factory method
      *
      * @param string $main Path to the main entrypoint script
+     *
      */
     private function __construct(string $main)
     {
@@ -169,7 +170,7 @@ class PharBuilder
         // while still allowing the use of absolute path based requires
         // @see https://bugs.php.net/bug.php?id=63028
         $lines[] = sprintf('set_include_path("phar://%s/");', $this->pharname);
-        $lines[] = sprintf('require "phar://%s/%s"; __HALT_COMPILER();', $this->pharname, $main);
+        $lines[] = sprintf('require "%s"; __HALT_COMPILER();', $main);
 
         return implode(self::EOL, $lines);
     }
