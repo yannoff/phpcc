@@ -97,11 +97,14 @@ class Compile extends Command
      * Add a single file to the archive builder
      *
      * @param string $file
+     *
      */
     protected function addFile(string $file)
     {
+        $fullpath = $this->fullpath($file);
+
         $this->info('+ ' . $file, 'grey');
-        $this->builder->addFile($file);
+        $this->builder->addFile($fullpath, $file);
     }
 
     /**
@@ -160,6 +163,23 @@ class Compile extends Command
         $this->builder->compile($output, $compression);
 
         return $this;
+    }
+
+    /**
+     * Get the full path to the file from the current working dir
+     *
+     * @param string $file
+     *
+     * @return string
+     */
+    protected function fullpath(string $file): string
+    {
+        // If it's an absolute path, let it unchanged
+        if (realpath($file) === $file) {
+            return $file;
+        }
+
+        return getcwd() . '/' . $file;
     }
 
     /**
