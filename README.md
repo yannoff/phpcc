@@ -35,9 +35,10 @@ phpcc --version
 phpcc \
     -e <main> \
     -o <output> \
-    [-d dir [-d dir ...]] \
-    [-f file [-f file ...]] \
-    [-b <banner>]
+    [-d <dir> [-d <dir> ...]] \
+    [-f <file> [-f <file> ...]] \
+    [-b <banner>] \
+    [-m <metadata> [-m <metadata> ...]]
 ```
 
 ### Options/Arguments
@@ -51,6 +52,7 @@ Name /  Shorthand   |  Type | Description                                       
 `--banner`, `-b`    | value | Specify the filepath to the legal notice banner<br/>_Will be included in the human-readable part of the stub._                                                                          |n
 `--file`, `-f`      | multi | Adds a single file to the archive                                                                                                                                                       |n
 `--dir`,  `-d`      | multi | Adds a sources directory to the archive<br/>_Possible dir spec formats:<br/>- `$dir` => include all files in directory<br/>- `$dir:$extension` => filter files on a specific extension_ |n
+`--meta`, `-m`      | multi | Adds a metadata to the archive<br/>_Metadata must be specified in the `$key:$value` format_                                                                                             |n
 
 
 ### Examples

@@ -58,6 +58,13 @@ class PharBuilder
     protected $banner;
 
     /**
+     * Store the archive metadata properties
+     *
+     * @var array
+     */
+    protected $metadata = [];
+
+    /**
      * PharBuilder factory method
      *
      * @param string $main Path to the main entrypoint script
@@ -124,6 +131,8 @@ class PharBuilder
             throw new LogicException("Main script {$this->main} contents must be added to the archive");
         }
 
+        $this->archive->setMetadata($this->metadata);
+
         $c = constant('Phar::' . $compression);
         $this->archive->compressFiles($c);
 
@@ -181,10 +190,27 @@ class PharBuilder
      * @param string  $file   Path to the file
      * @param ?string $local  Optional file alias
      * @param bool    $minify Whether comments/spaces should be removed from contents
+     *
+     * @return self
      */
-    public function addFile(string $file, string $local = null, bool $minify = true)
+    public function addFile(string $file, string $local = null, bool $minify = true): self
     {
         $this->archive->addFileContents($file, $local, $minify);
+
+        return $this;
+    }
+
+    /**
+     * Add or update an archive metadata entry
+     *
+     * @param string $name
+     * @param ?mixed $value
+     *
+     * @return self
+     */
+    public function addMetadata(string $name, $value = null): self
+    {
+        $this->metadata[$name] = $value;
 
         return $this;
     }
