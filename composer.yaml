@@ -13,4 +13,4 @@ autoload:
         Yannoff\PhpCodeCompiler\: src/
 require:
     php: '>=7.1'
-    yannoff/console: ^2.2
+    yannoff/console: ^2.3
