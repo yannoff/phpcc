@@ -28,3 +28,13 @@ phpcc -d src:php -d src:phtml -e main.php -o bin/foobar
 ```bash
 phpcc -e app.php -o foobar.phar -b LICENSE
 ```
+
+## Example 4: Add sparse single PHP files
+
+- Define `app.php` as the stub main entrypoint script
+- Save compiled phar executable to `foobar.phar`
+- Add `foo.php` and `bar.php` files to the archive
+
+```bash
+phpcc -e app.php -o foobar.phar -f foo.php -f bar.php
+```
