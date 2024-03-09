@@ -37,6 +37,7 @@ class Compile extends Command
             ->addOption('main', 'e', Option::VALUE, 'Set the PHAR stub\'s main entrypoint script')
             ->addOption('dir', 'd', Option::MULTI, 'Add directory contents ("-d $dir") optionally filtered on a specific file extension ("$dir:$extension")')
             ->addOption('file', 'f', Option::MULTI, 'Add a single file to the archive')
+            ->addOption('meta', 'm', Option::MULTI, 'Add a metadata property (eg: "-m $key:$value")')
             ->addOption('output', 'o', Option::VALUE, 'Set the compiled archive output name')
             ->addOption('banner', 'b', Option::VALUE, 'Load legal notice from the given banner file')
         ;
@@ -51,6 +52,7 @@ class Compile extends Command
 
         $dirs = $this->getOption('dir') ?? [];
         $files = $this->getOption('file') ?? [];
+        $meta = $this->getOption('meta') ?? [];
 
         $output = $this->getOption('output');
         $main = $this->getOption('main');
@@ -60,6 +62,7 @@ class Compile extends Command
             ->addFiles($files)
             ->addDirectories($dirs)
             ->setNotice($banner)
+            ->addMetadata($meta)
             ->publish($output)
             ->info('Build complete.')
         ;
@@ -144,6 +147,25 @@ class Compile extends Command
         foreach ($files as $file) {
             $this->info("Adding single file <strong>$file</strong>...");
             $this->addFile($file);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a list of metadata properties to the archive builder
+     *
+     * @param string[] $definitions A list of $key:$value pairs
+     *
+     * @return self
+     */
+    protected function addMetadata(array $definitions): self
+    {
+        foreach ($definitions as $definition) {
+            list($name, $value) = explode(':', $definition);
+            $this->info("Adding <strong>$name</strong> metadata property");
+            $this->info("-> $name: $value", 'grey');
+            $this->builder->addMetadata($name, $value);
         }
 
         return $this;

@@ -38,3 +38,13 @@ phpcc -e app.php -o foobar.phar -b LICENSE
 ```bash
 phpcc -e app.php -o foobar.phar -f foo.php -f bar.php
 ```
+
+## Example 5: Adding metadata to the archive
+
+- Define `app.php` as the stub main entrypoint script
+- Save compiled phar executable to `bin/acme`
+- Add the `license` & `author` metadata to the archive
+
+```bash
+phpcc -e app.php -o bin/acme -m license:MIT -m author:yannoff
+```

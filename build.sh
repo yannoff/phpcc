@@ -25,4 +25,4 @@ fi
 
 sed -i "s/\$VERSION *=.*/\$VERSION = '$version';/" $main
 
-php -dphar.readonly=0 bin/compile.php -d src:php -d vendor:php -e $main -o $phar -b .banner
+php -dphar.readonly=0 bin/compile.php -d src:php -d vendor:php -e $main -o $phar -b .banner -m license:MIT -m author:yannoff -m copyright:yannoff
