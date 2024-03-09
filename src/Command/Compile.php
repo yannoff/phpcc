@@ -36,6 +36,7 @@ class Compile extends Command
             ->setHelp('PHP Code compiler - Phar executable compiling utility')
             ->addOption('main', 'e', Option::VALUE, 'Set the PHAR stub\'s main entrypoint script')
             ->addOption('dir', 'd', Option::MULTI, 'Add directory contents ("-d $dir") optionally filtered on a specific file extension ("$dir:$extension")')
+            ->addOption('file', 'f', Option::MULTI, 'Add a single file to the archive')
             ->addOption('output', 'o', Option::VALUE, 'Set the compiled archive output name')
             ->addOption('banner', 'b', Option::VALUE, 'Load legal notice from the given banner file')
         ;
@@ -49,11 +50,14 @@ class Compile extends Command
         $banner = $this->getOption('banner') ?? '';
 
         $dirs = $this->getOption('dir') ?? [];
+        $files = $this->getOption('file') ?? [];
+
         $output = $this->getOption('output');
         $main = $this->getOption('main');
 
         $this
             ->initBuilder($main)
+            ->addFiles($files)
             ->addDirectories($dirs)
             ->setNotice($banner)
             ->publish($output)
@@ -96,7 +100,7 @@ class Compile extends Command
     /**
      * Add a single file to the archive builder
      *
-     * @param string $file
+     * @param string $file A relative or absolute file path
      *
      */
     protected function addFile(string $file)
@@ -110,7 +114,7 @@ class Compile extends Command
     /**
      * Add a list of directory specifications to the archive builder
      *
-     * @param array $dirs A list of directories in the form "$dir" or "$dir:$extension"
+     * @param string[] $dirs A list of specs in the form "$dir" or "$dir:$extension"
      *
      * @return self
      */
@@ -120,9 +124,26 @@ class Compile extends Command
             list($directory, $extensions) = explode(':', $spec);
 
             $wildcard = $extensions ? "*.$extensions" : 'all';
-            $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files ...");
+            $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files...");
 
             $this->addDirectory($directory, $extensions);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a list of single files to the archive builder
+     *
+     * @param string[] $files A list of relative or absolute file paths
+     *
+     * @return self
+     */
+    protected function addFiles(array $files): self
+    {
+        foreach ($files as $file) {
+            $this->info("Adding single file <strong>$file</strong>...");
+            $this->addFile($file);
         }
 
         return $this;
@@ -138,7 +159,7 @@ class Compile extends Command
     protected function setNotice(string $banner = null): self
     {
         if (is_file($banner)) {
-            $this->info("Loading banner contents from <strong>$banner</strong> file ...");
+            $this->info("Loading banner contents from <strong>$banner</strong> file...");
             $contents = file_get_contents($banner);
             $header = $this->phpdocize($contents);
 
@@ -159,7 +180,7 @@ class Compile extends Command
      */
     protected function publish(string $output, string $compression = 'GZ'): self
     {
-        $this->info("Writing Phar archive to <strong>$output</strong> ...");
+        $this->info("Writing Phar archive to <strong>$output</strong>...");
         $this->builder->compile($output, $compression);
 
         return $this;

@@ -29,7 +29,7 @@ chmod +x ${BINDIR}/phpcc
 ```
 phpcc --help
 phpcc --version
-phpcc -e <entrypoint> -o <output> [-d dir [-d dir ...]] [-b <banner>] [-l <license>]
+phpcc -e <entrypoint> -o <output> [-d dir [-d dir ...]] [-f file [-f file ...]] [-b <banner>]
 ```
 
 ### Options/Arguments
@@ -44,9 +44,15 @@ phpcc -e <entrypoint> -o <output> [-d dir [-d dir ...]] [-b <banner>] [-l <licen
 
 **MANDATORY** The Phar archive output file.
 
+#### `-f`, `--file`
+
+Adds a single file to the archive.
+
+_Multiple values allowed here_
+
 #### `-d`, `--dir`
 
-Adds a PHP sources directory to the archive.
+Adds a sources directory to the archive.
 
 _Multiple values allowed here_
 
