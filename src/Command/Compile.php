@@ -17,6 +17,7 @@ namespace Yannoff\PhpCodeCompiler\Command;
 
 use Yannoff\Component\Console\Command;
 use Yannoff\Component\Console\Definition\Option;
+use Yannoff\Component\Console\Exception\RuntimeException;
 use Yannoff\PhpCodeCompiler\Directory;
 use Yannoff\PhpCodeCompiler\PharBuilder;
 
@@ -54,8 +55,8 @@ class Compile extends Command
         $files = $this->getOption('file') ?? [];
         $meta = $this->getOption('meta') ?? [];
 
-        $output = $this->getOption('output');
-        $main = $this->getOption('main');
+        $main = $this->require('main');
+        $output = $this->require('output');
 
         $this
             ->initBuilder($main)
@@ -223,6 +224,26 @@ class Compile extends Command
         }
 
         return getcwd() . '/' . $file;
+    }
+
+    /**
+     * Try to get the required option, raise an exception if not set
+     *
+     * @param string $option The option name
+     *
+     * @return mixed
+     *
+     * @throws RuntimeException If the required option is not set
+     */
+    protected function require(string $option)
+    {
+        $value = $this->getOption($option);
+
+        if (null === $value) {
+            throw new RuntimeException("Mandatory option --{$option} is missing");
+        }
+
+        return $value;
     }
 
     /**
