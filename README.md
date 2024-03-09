@@ -29,42 +29,28 @@ chmod +x ${BINDIR}/phpcc
 ```
 phpcc --help
 phpcc --version
-phpcc -e <entrypoint> -o <output> [-d dir [-d dir ...]] [-f file [-f file ...]] [-b <banner>]
+```
+
+```
+phpcc \
+    -e <entrypoint> \
+    -o <output> \
+    [-d dir [-d dir ...]] \
+    [-f file [-f file ...]] \
+    [-b <banner>]
 ```
 
 ### Options/Arguments
 
 > The output and entrypoint scripts are mandatory.
 
-#### `-e`, `--entrypoint`
-
-**MANDATORY** The main application entrypoint script.
-
-#### `-o`, `--output`
-
-**MANDATORY** The Phar archive output file.
-
-#### `-f`, `--file`
-
-Adds a single file to the archive.
-
-_Multiple values allowed here_
-
-#### `-d`, `--dir`
-
-Adds a sources directory to the archive.
-
-_Multiple values allowed here_
-
-> Each directory may be of the form:
-> - `$dir` => include all files in directory
-> - `$dir:$extension` => filter files on a specific extension
-
-#### `-b`, `--banner`
-
-Filepath to the legal notice banner.
-
-_Will be included in the human-readable part of the stub._
+Name /  Shorthand   |  Type | Description                                                                                                                                                                             |Required
+--------------------|:-----:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:
+`--output`, `-o`    | value | The Phar archive output file                                                                                                                                                            |y
+`--entrypoint`, `-e`| value | The main application entrypoint script                                                                                                                                                  |y
+`--banner`, `-b`    | value | Specify the filepath to the legal notice banner<br/>_Will be included in the human-readable part of the stub._                                                                          |n
+`--file`, `-f`      | multi | Adds a single file to the archive                                                                                                                                                       |n
+`--dir`,  `-d`      | multi | Adds a sources directory to the archive<br/>_Possible dir spec formats:<br/>- `$dir` => include all files in directory<br/>- `$dir:$extension` => filter files on a specific extension_ |n
 
 
 ### Examples
