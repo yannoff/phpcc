@@ -15,7 +15,7 @@
 
 error_reporting(E_ALL);
 
-$VERSION = '1.0.0';
+$VERSION = '1.1.0';
 
 /**
  * BEWARE:
