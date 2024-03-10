@@ -23,6 +23,28 @@ then
     exit 1
 fi
 
+# Ensure dependencies are up-to-date
+offenbach install --no-dev --no-interaction --optimize-autoloader
+
+# Update version in main application bootstrap file
 sed -i "s/\$VERSION *=.*/\$VERSION = '$version';/" $main
 
-php -dphar.readonly=0 bin/compile.php -d src:php -d vendor:php -e $main -o $phar -b .banner -m license:MIT -m author:yannoff -m copyright:yannoff
+args=()
+
+# Add src/ & vendor/ as source directories
+args+=(--dir src:php)
+args+=(--dir vendor:php)
+
+# Set bootstrap & output properties
+args+=(--main $main)
+args+=(--output $phar)
+
+# Set the legal banner file
+args+=(--banner .banner)
+
+# Add archive metadata properties
+args+=(--meta license:MIT)
+args+=(--meta author:yannoff)
+args+=(--meta copyright:yannoff)
+
+php -dphar.readonly=0 bin/compile.php "${args[@]}"
