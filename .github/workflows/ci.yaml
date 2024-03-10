@@ -45,7 +45,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Install PHP & Offenbach
-              uses: yannoff/offenbach/actions/install@master
+              uses: yannoff/offenbach/actions/install@1.7.1
               with:
                   php-version: ${{ matrix.php-versions }}
 
