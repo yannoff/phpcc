@@ -2,25 +2,23 @@
 
 PHP Code compiler - Phar executable compiling utility
 
-## Requirements
+## Help Contents
 
-- `php` or `paw` 7.1+
-- `phar.readonly` php config directive must be set to `Off`
-
-## Install
-
-_Get the latest release from Github_
-
-> :bulb: `${BINDIR}` may be /usr/bin, /usr/local/bin or $HOME/bin
-
-```bash
-curl -Lo ${BINDIR}/phpcc https://github.com/yannoff/phpcc/releases/latest/download/phpcc
-```
-_Add execution permissions to the binary_
-
-```bash
-chmod +x ${BINDIR}/phpcc
-```
+- [Usage](#usage)
+    - [Synopsis](#synopsis)
+    - [Options/Arguments](#optionsarguments)
+    - [Examples](#examples)
+        - [A concrete use-case: the `phpcc` self-compiling command](#a-concrete-use-case-the-phpcc-self-compiling-command)
+        - [Example 1: PHP sources located in several directories](#example-1-php-sources-located-in-several-directories)
+        - [Example 2: Multiple extensions in the same directory](#example-2-multiple-extensions-in-the-same-directory)
+        - [Example 3: Standalone php script](#example-3-standalone-php-script)
+        - [Example 4: Add sparse single PHP files](#example-4-add-sparse-single-php-files)
+        - [Example 5: Adding metadata to the archive](#example-5-adding-metadata-to-the-archive)
+- [Install](#install)
+    - [Requirements](#requirements)
+    - [Quick install](#quick-install)
+    - [Nightly versions](#nightly-versions)
+- [License](#license)
 
 ## Usage
 
@@ -62,7 +60,101 @@ Name /  Shorthand   |  Type | Description                                       
 ```bash
 phpcc -d src:php -d vendor:php -e bin/compile.php -o bin/phpcc -b .banner
 ```
-_More use cases can be found in the [examples](doc/examples.md) documentation._
+
+#### Example 1: PHP sources located in several directories
+
+- Add all `*.php` files from `src/` and `vendor/` dirs
+- Define `main.php` as the stub main entrypoint script
+- Save compiled phar executable to `bin/foobar`
+
+```bash
+phpcc -d src:php -d vendor:php -e main.php -o bin/foobar
+```
+#### Example 2: Multiple extensions in the same directory
+
+- Add all `*.php` and `*.phtml` files from `src/` dir
+- Define `main.php` as the stub main entrypoint script
+- Save compiled phar executable to `bin/foobar`
+
+```bash
+phpcc -d src:php -d src:phtml -e main.php -o bin/foobar
+```
+
+#### Example 3: Standalone php script
+
+- Define `app.php` as the stub main entrypoint script
+- Save compiled phar executable to `foobar.phar`
+- Use `LICENSE` file contents as legal notice banner
+
+```bash
+phpcc -e app.php -o foobar.phar -b LICENSE
+```
+
+#### Example 4: Add sparse single PHP files
+
+- Define `app.php` as the stub main entrypoint script
+- Save compiled phar executable to `foobar.phar`
+- Add `foo.php` and `bar.php` files to the archive
+
+```bash
+phpcc -e app.php -o foobar.phar -f foo.php -f bar.php
+```
+
+#### Example 5: Adding metadata to the archive
+
+- Define `app.php` as the stub main entrypoint script
+- Save compiled phar executable to `bin/acme`
+- Add the `license` & `author` metadata to the archive
+
+```bash
+phpcc -e app.php -o bin/acme -m license:MIT -m author:yannoff
+```
+
+## Install
+
+### Requirements
+
+- `php` or `paw` 7.1+
+- `phar.readonly` php config directive must be set to `Off`
+
+### Quick install
+
+_Get the latest release from Github_
+
+> :bulb: `${BINDIR}` may be /usr/bin, /usr/local/bin or $HOME/bin
+
+```bash
+curl -Lo ${BINDIR}/phpcc https://github.com/yannoff/phpcc/releases/latest/download/phpcc
+```
+_Add execution permissions to the binary_
+
+```bash
+chmod +x ${BINDIR}/phpcc
+```
+
+### Nightly versions
+
+Want to test the edge version ?
+
+_Clone a local copy of the repository_
+
+```bash
+git clone https://github.com/yannoff/phpcc.git
+```
+
+_Symlink the binary_
+
+```bash
+cd ${BINDIR}
+ln -s /path/to/working/copy/bin/phpcc
+```
+
+_Stay up-to-date_
+
+```bash
+cd /path/to/working/copy
+git pull --rebase
+```
 
 ## License
 
