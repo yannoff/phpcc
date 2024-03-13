@@ -112,7 +112,12 @@ class Compile extends Command
         $fullpath = $this->fullpath($file);
 
         $this->info('+ ' . $file, 'grey');
-        $this->builder->addFile($fullpath, $file);
+
+        // Only minify pure PHP source files, other files such as
+        // code templates for instance, should be left as-is
+        $minify = (pathinfo($file, PATHINFO_EXTENSION) === 'php');
+
+        $this->builder->addFile($fullpath, $file, $minify);
     }
 
     /**
