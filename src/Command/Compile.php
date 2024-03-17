@@ -41,6 +41,7 @@ class Compile extends Command
             ->addOption('meta', 'm', Option::MULTI, 'Add a metadata property (eg: "-m $key:$value")')
             ->addOption('output', 'o', Option::VALUE, 'Set the compiled archive output name')
             ->addOption('banner', 'b', Option::VALUE, 'Load legal notice from the given banner file')
+            ->addOption('shebang-less', '', Option::FLAG, 'Produce a stub deprived of the shebang directive')
         ;
     }
 
@@ -58,13 +59,15 @@ class Compile extends Command
         $main = $this->require('main');
         $output = $this->require('output');
 
+        $shebang = (!$this->getOption('shebang-less'));
+
         $this
             ->initBuilder($main)
             ->addFiles($files)
             ->addDirectories($dirs)
             ->setNotice($banner)
             ->addMetadata($meta)
-            ->publish($output)
+            ->publish($output, $shebang)
             ->info('Build complete.')
         ;
     }
@@ -202,14 +205,15 @@ class Compile extends Command
      * Compile the Phar archive and write contents to disk
      *
      * @param string $output      Path to the phar archive output file
+     * @param bool   $shebang     Whether to include the shebang line
      * @param string $compression Compression type - "GZ" or "BZ2"
      *
      * @return self
      */
-    protected function publish(string $output, string $compression = 'GZ'): self
+    protected function publish(string $output, bool $shebang, string $compression = 'GZ'): self
     {
         $this->info("Writing Phar archive to <strong>$output</strong>...");
-        $this->builder->compile($output, $compression);
+        $this->builder->compile($output, $shebang, $compression);
 
         return $this;
     }

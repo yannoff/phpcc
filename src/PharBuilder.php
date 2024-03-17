@@ -122,9 +122,10 @@ class PharBuilder
      * Compress files, generate the stub and save PHAR to the output file
      *
      * @param string $output      Path to the final output file
+     * @param bool   $shebang     Include a shebang directive line in the stub ?
      * @param string $compression Compression type - "GZ" or "BZ2" (defaults to "GZ")
      */
-    public function compile(string $output, string $compression = 'GZ')
+    public function compile(string $output, bool $shebang, string $compression = 'GZ')
     {
         // Check that entrypoint script contents has been added to the archive before proceeding
         if (!$this->archive->has($this->main)) {
@@ -137,7 +138,7 @@ class PharBuilder
         $this->archive->compressFiles($c);
 
         // NB: It's important to set the stub AFTER the files compression step so it is kept as plain text
-        $this->archive->setStub($this->stub($this->main, $this->banner));
+        $this->archive->setStub($this->stub($this->main, $shebang, $this->banner));
         // Create file on the disk
         $this->archive->stopBuffering();
         // Make file executable
@@ -159,17 +160,19 @@ class PharBuilder
     /**
      * Generate the PHAR stub definition contents
      *
-     * @param string  $main   The main entrypoint script
-     * @param ?string $banner Optional legal notice text
+     * @param string  $main    The main entrypoint script
+     * @param bool    $shebang Whether to include the shebang line
+     * @param ?string $banner  Optional legal notice text
      *
      * @return string
      */
-    protected function stub(string $main, string $banner = null): string
+    protected function stub(string $main, bool $shebang = true, string $banner = null): string
     {
-        $lines = [
-            '#!/usr/bin/env php',
-            '<?php',
-        ];
+        $lines = [];
+        if ($shebang) {
+            $lines[] = '#!/usr/bin/env php';
+        }
+        $lines[] = '<?php';
         if ($banner) {
             $lines[] = $banner;
         }
