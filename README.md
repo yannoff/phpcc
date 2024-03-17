@@ -17,7 +17,6 @@ PHP Code compiler - Phar executable compiling utility
 - [Install](#install)
     - [Requirements](#requirements)
     - [Quick install](#quick-install)
-    - [Nightly versions](#nightly-versions)
 - [License](#license)
 
 ## Usage
@@ -131,30 +130,6 @@ _Add execution permissions to the binary_
 
 ```bash
 chmod +x ${BINDIR}/phpcc
-```
-
-### Nightly versions
-
-Want to test the edge version ?
-
-_Clone a local copy of the repository_
-
-```bash
-git clone https://github.com/yannoff/phpcc.git
-```
-
-_Symlink the binary_
-
-```bash
-cd ${BINDIR}
-ln -s /path/to/working/copy/bin/phpcc
-```
-
-_Stay up-to-date_
-
-```bash
-cd /path/to/working/copy
-git pull --rebase
 ```
 
 ## License
