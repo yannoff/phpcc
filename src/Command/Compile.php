@@ -196,10 +196,10 @@ class Compile extends Command
     {
         if (is_file($banner)) {
             $this->info("Loading banner contents from <strong>$banner</strong> file...");
-            $contents = file_get_contents($banner);
+            $contents = file($banner, FILE_IGNORE_NEW_LINES);
             $header = $this->phpdocize($contents);
 
-            $this->info($header, 'grey');
+            $this->info(implode("\n", $header), 'grey');
             $this->builder->setBanner($header);
         }
 
@@ -264,21 +264,21 @@ class Compile extends Command
     /**
      * Return the contents wrapped in a comments block
      *
-     * @param string $contents
+     * @param string[] $contents
      *
-     * @return string
+     * @return string[]
      */
-    protected function phpdocize(string $contents): string
+    protected function phpdocize(array $contents): array
     {
         $lines = array_map(
             function($line) { return sprintf(' * %s', $line); },
-            explode("\n", $contents)
+            $contents
         );
 
         array_unshift($lines, '/**');
         array_push($lines, ' */');
 
-        return implode("\n",$lines);
+        return $lines;
     }
 
     /**
