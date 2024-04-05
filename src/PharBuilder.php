@@ -124,8 +124,10 @@ class PharBuilder
      * @param string $output      Path to the final output file
      * @param bool   $shebang     Include a shebang directive line in the stub ?
      * @param string $compression Compression type - "GZ" or "BZ2" (defaults to "GZ")
+     *
+     * @return int The written file size in bytes
      */
-    public function compile(string $output, bool $shebang, string $compression = 'GZ')
+    public function compile(string $output, bool $shebang, string $compression = 'GZ'): int
     {
         // Check that entrypoint script contents has been added to the archive before proceeding
         if (!$this->archive->has($this->main)) {
@@ -143,8 +145,12 @@ class PharBuilder
         $this->archive->stopBuffering();
         // Make file executable
         chmod($this->pharname, 0755);
-        //
+        // Stat phar filesize
+        $size = filesize($this->pharname);
+        // Move temporary phar to final output
         rename($this->pharname, $output);
+
+        return $size;
     }
 
     /**

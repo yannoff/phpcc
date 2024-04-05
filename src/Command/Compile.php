@@ -95,13 +95,16 @@ class Compile extends Command
      * @param string  $directory  The directory to scan for contents
      * @param ?string $extensions Filter on extension, may be "php" or "(php|phtml)"
      *
+     * @return int The number of added files
      */
-    protected function addDirectory(string $directory, string $extensions = null)
+    protected function addDirectory(string $directory, string $extensions = null): int
     {
         $filter = ($extensions) ? sprintf('/\.%s$/', $extensions) : '';
         $files = Directory::find($directory, $filter);
 
         array_walk($files, function ($file) { $this->addFile($file); });
+
+        return count($files);
     }
 
     /**
@@ -138,7 +141,9 @@ class Compile extends Command
             $wildcard = $extensions ? "*.$extensions" : 'all';
             $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files...");
 
-            $this->addDirectory($directory, $extensions);
+            $count = $this->addDirectory($directory, $extensions);
+
+            $this->info("Added {$count} files.", 'grey');
         }
 
         return $this;
@@ -212,8 +217,9 @@ class Compile extends Command
      */
     protected function publish(string $output, bool $shebang, string $compression = 'GZ'): self
     {
-        $this->info("Writing Phar archive to <strong>$output</strong>...");
-        $this->builder->compile($output, $shebang, $compression);
+        $this->info("Saving archive to <strong>$output</strong>...");
+        $size = $this->builder->compile($output, $shebang, $compression);
+        $this->info("{$size} bytes written.", 'grey');
 
         return $this;
     }
