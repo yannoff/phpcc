@@ -18,6 +18,7 @@ namespace Yannoff\PhpCodeCompiler\Command;
 use Yannoff\Component\Console\Command;
 use Yannoff\Component\Console\Definition\Option;
 use Yannoff\Component\Console\Exception\RuntimeException;
+use Yannoff\PhpCodeCompiler\Contents;
 use Yannoff\PhpCodeCompiler\Directory;
 use Yannoff\PhpCodeCompiler\PharBuilder;
 
@@ -196,8 +197,7 @@ class Compile extends Command
     {
         if (is_file($banner)) {
             $this->info("Loading banner contents from <strong>$banner</strong> file...");
-            $contents = file($banner, FILE_IGNORE_NEW_LINES);
-            $header = $this->phpdocize($contents);
+            $header = $this->phpdocize($banner);
 
             $this->info(implode("\n", $header), 'grey');
             $this->builder->setBanner($header);
@@ -264,25 +264,22 @@ class Compile extends Command
     /**
      * Return the contents wrapped in a comments block
      *
-     * @param string[] $contents
+     * @param string $banner
      *
      * @return string[]
      */
-    protected function phpdocize(array $contents): array
+    protected function phpdocize(string $banner): array
     {
-        $lines = array_map(
-            function($line) { return sprintf(' * %s', $line); },
-            $contents
-        );
-
-        array_unshift($lines, '/**');
-        array_push($lines, ' */');
-
-        return $lines;
+        return Contents::file($banner)
+            ->prefix(' * ')
+            ->push(' */')
+            ->unshift('/**')
+            ->all()
+        ;
     }
 
     /**
-     * Print a message to STDERR, optionally encapsuled by styling tags
+     * Print a message to STDERR, optionally encapsulated by styling tags
      *
      * @param string $message
      * @param string $tag
