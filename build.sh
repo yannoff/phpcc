@@ -42,9 +42,13 @@ args+=(--output $phar)
 # Set the legal banner file
 args+=(--banner .banner)
 
+# Add license file
+args+=(--file LICENSE)
+
 # Add archive metadata properties
 args+=(--meta license:MIT)
 args+=(--meta author:yannoff)
 args+=(--meta copyright:yannoff)
 
+echo php -dphar.readonly=0 bin/compile.php "${args[@]}"
 php -dphar.readonly=0 bin/compile.php "${args[@]}"
