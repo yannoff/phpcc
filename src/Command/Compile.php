@@ -198,9 +198,8 @@ class Compile extends Command
         if (is_file($banner)) {
             $this->info("Loading banner contents from <strong>$banner</strong> file...");
             $header = $this->phpdocize($banner);
-
-            $this->info(implode("\n", $header), 'grey');
             $this->builder->setBanner($header);
+            $this->info($header->join("\n"), 'grey');
         }
 
         return $this;
@@ -268,13 +267,12 @@ class Compile extends Command
      *
      * @return string[]
      */
-    protected function phpdocize(string $banner): array
+    protected function phpdocize(string $banner): Contents
     {
         return Contents::file($banner)
             ->prefix(' * ')
             ->push(' */')
             ->unshift('/**')
-            ->all()
         ;
     }
 

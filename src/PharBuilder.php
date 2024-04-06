@@ -53,7 +53,7 @@ class PharBuilder
     /**
      * Optional banner/legal notice
      *
-     * @var string[]
+     * @var Contents
      */
     protected $banner;
 
@@ -107,11 +107,11 @@ class PharBuilder
     /**
      * Setter for the banner contents
      *
-     * @param string[] $banner
+     * @param Contents $banner
      *
      * @return self
      */
-    public function setBanner(array $banner): self
+    public function setBanner(Contents $banner): self
     {
         $this->banner = $banner;
 
@@ -166,15 +166,15 @@ class PharBuilder
     /**
      * Generate the PHAR stub definition contents
      *
-     * @param string    $main    The main entrypoint script
-     * @param bool      $shebang Whether to include the shebang line
-     * @param ?string[] $banner  Optional legal notice text
+     * @param string   $main    The main entrypoint script
+     * @param bool     $shebang Whether to include the shebang line
+     * @param Contents $banner  Optional legal notice text
      *
      * @return string
      */
-    protected function stub(string $main, bool $shebang = true, array $banner = null): string
+    protected function stub(string $main, bool $shebang = true, Contents $banner = null): string
     {
-        $lines = $banner ?? [];
+        $lines = ($banner ?? Contents::load())->all();
         $lines[] = sprintf('// Compiled with PHP version %s', PHP_VERSION);
         $lines[] = sprintf('Phar::mapPhar("%s");', $this->pharname);
         // Add support for builtin phar flavoured require "vendor/autoload.php"
