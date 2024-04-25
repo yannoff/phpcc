@@ -17,6 +17,7 @@ PHP Code compiler - Phar executable compiling utility
 - [Install](#install)
     - [Requirements](#requirements)
     - [Quick install](#quick-install)
+- [Pitfalls](#pitfalls)
 - [License](#license)
 
 ## Usage
@@ -133,6 +134,59 @@ _Add execution permissions to the binary_
 ```bash
 chmod +x ${BINDIR}/phpcc
 ```
+
+## Pitfalls
+
+Here is a (non-exhaustive) list of the most common mistakes related to PHAR compiling.
+
+### Shebang line in main script
+
+Since the main (entrypoint) script will be **included** in the PHAR stub, it must not contain any shebang line, otherwise this line will be treated as text and printed to standard output when invoking the compiled PHAR.
+
+_Example: Invoking a version of `phpcc` compiled with a shebang line in `bin/compile.php`_
+
+```
+$ bin/phpcc --version
+#!/usr/bin/env php
+PHP Code Compiler version 1.3.0-dev
+```
+
+### Local versus compiled files
+
+Let's consider the following tree (all files required by the app)
+
+```
+bin/acme.php
+src/Command/Acme.php
+src/Command/SomeClass.php
+lib/Ufo.php
+```
+
+Compile it (Oops... one Unknown File Object has not been included)
+
+```
+phpcc -e bin/acme.php -f bin/acme.php -d src/ -o bin/acme
+```
+
+Guess what ?
+
+If the `bin/acme` compiled archive stays in its place, it won't fail, because `lib/Ufo.php` can still be found from its point of view.
+
+### Size too big
+
+Many projects include some dev libraries, for unit test, local data seeding or code inspection.
+
+Fact is, some of those libs have **A LOT** of dependencies... Hence the `vendor` directory, which is usually included in the archive is really **HUGE**.
+
+Q: How do we remediate then ?
+
+A: Before compiling, we ensure the `vendor` directory does not contains any dev library:
+
+```
+composer install --no-dev
+phpcc -e bin/acme.php -f bin/acme.php -d src/:php -d vendor:php -d vendor:yaml -o bin/acme
+```
+
 
 ## License
 
