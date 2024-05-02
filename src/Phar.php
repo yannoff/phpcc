@@ -17,6 +17,70 @@ namespace Yannoff\PhpCodeCompiler;
 
 use Phar as BuiltinPhar;
 
+/**
+ * Replacement for the `php_strip_whitespace()` native method,
+ * which mistakenly treat php attributes as bash-like comments
+ *
+ * @param string $file
+ *
+ * @return string
+ */
+function php_strip_whitespace(string $file): string
+{
+    $lines = file($file, FILE_IGNORE_NEW_LINES);
+
+    // First pass, one-line comments
+    // Processing is easier using a per-line approach
+    $lines = array_map(function ($line) {
+        if (preg_match('!^(//|#[^\[]).*$!', $line)) {
+            return null;
+        }
+        // Prevent processing non-comment lines (eg: containing php:// or http:// uris)
+        // to be mistakenly treated as such
+        return preg_replace('!\s(//|#[^\[]).*$!', '', $line);
+        // Not working: breaks phpcc self-compiling
+        //return preg_replace('!([^:])' . '(//|#[^\[])' . '.*$!', '$1', $line);
+    }, $lines);
+
+    // Second pass: multi-line comments
+    // At this point we can use a token approach
+    $contents = implode(" ", $lines);
+    $tokens = explode(" ", $contents);
+
+    $tokens = array_filter($tokens, static function ($token) {
+        static $isMultiLineComment = false;
+
+        if ($token == '*/' && $isMultiLineComment) {
+            $isMultiLineComment = false;
+            return false;
+        }
+
+        if ($isMultiLineComment)
+            return false;
+
+        if (trim($token) == '/**' || trim($token) == '/*') {
+            $isMultiLineComment = true;
+            return false;
+        }
+
+        return true;
+    });
+
+    $text = implode(" ", $tokens);
+    $text = preg_replace('/\s\s+/', ' ', $text);
+
+    // Restore compatibility for heredoc blocks
+    // NOTE: Line-breaks inside heredoc are not preserved
+    preg_match("/.*<<<" . "'([A-Z]+)'/", $text, $m);
+    for ($i = 1; $i < count($m); $i++) {
+        $boundary = $m[$i];
+        $text = str_replace("<<<'$boundary'", "<<<'$boundary'\n", $text);
+        $text = str_replace("$boundary;", "\n$boundary;\n", $text);
+    }
+
+    return $text;
+}
+
 class Phar extends BuiltinPhar
 {
     public $files = [];
@@ -35,6 +99,7 @@ class Phar extends BuiltinPhar
         $this->files[] = $key;
 
         $contents = $minify ? php_strip_whitespace($filename) : file_get_contents($filename);
+
         $this[$key] = $contents;
     }
 
