@@ -53,7 +53,7 @@ class PharBuilder
     /**
      * Optional banner/legal notice
      *
-     * @var string
+     * @var string[]
      */
     protected $banner;
 
@@ -107,11 +107,11 @@ class PharBuilder
     /**
      * Setter for the banner contents
      *
-     * @param string $banner
+     * @param string[] $banner
      *
      * @return self
      */
-    public function setBanner(string $banner): self
+    public function setBanner(array $banner): self
     {
         $this->banner = $banner;
 
@@ -166,22 +166,15 @@ class PharBuilder
     /**
      * Generate the PHAR stub definition contents
      *
-     * @param string  $main    The main entrypoint script
-     * @param bool    $shebang Whether to include the shebang line
-     * @param ?string $banner  Optional legal notice text
+     * @param string    $main    The main entrypoint script
+     * @param bool      $shebang Whether to include the shebang line
+     * @param ?string[] $banner  Optional legal notice text
      *
      * @return string
      */
-    protected function stub(string $main, bool $shebang = true, string $banner = null): string
+    protected function stub(string $main, bool $shebang = true, array $banner = null): string
     {
-        $lines = [];
-        if ($shebang) {
-            $lines[] = '#!/usr/bin/env php';
-        }
-        $lines[] = '<?php';
-        if ($banner) {
-            $lines[] = $banner;
-        }
+        $lines = $banner ?? [];
         $lines[] = sprintf('// Compiled with PHP version %s', PHP_VERSION);
         $lines[] = sprintf('Phar::mapPhar("%s");', $this->pharname);
         // Add support for builtin phar flavoured require "vendor/autoload.php"
@@ -189,6 +182,12 @@ class PharBuilder
         // @see https://bugs.php.net/bug.php?id=63028
         $lines[] = sprintf('set_include_path("phar://%s/");', $this->pharname);
         $lines[] = sprintf('require "%s"; __HALT_COMPILER();', $main);
+
+        array_unshift($lines, '<?php');
+
+        if ($shebang) {
+            array_unshift($lines, '#!/usr/bin/env php');
+        }
 
         return implode(self::EOL, $lines);
     }
