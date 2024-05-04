@@ -51,6 +51,7 @@ Name /  Shorthand   |  Type | Description                                       
 `--dir`,  `-d`      | multi | Adds a sources directory to the archive<br/>_Possible dir spec formats:<br/>- `$dir` => include all files in directory<br/>- `$dir:$extension` => filter files on a specific extension_ |n
 `--meta`, `-m`      | multi | Adds a metadata to the archive<br/>_Metadata must be specified in the `$key:$value` format_                                                                                             |n
 `--shebang-less`    | flag  | Produce a stub deprived of the shebang directive<br/>_Useful when the phar is meant to be included instead of being executed directly_                                                  |n
+`--quiet`, `-q`     | flag  | Reduce output messages amount: set verbosity level to `INFO` instead of default `DEBUG`                                                                                                 |n
 
 
 ### Examples
