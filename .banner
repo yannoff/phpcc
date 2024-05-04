@@ -1,6 +1,6 @@
-PHP Code Compiler - Phar executable compiling utility
+PHP Code Compiler - PHAR executable compiling utility
 
  Copyright (c) Yann Blacher (Yannoff) - MIT License
   
-For the full copyright and license information, please see
-{@link https://github.com/yannoff/phpcc/blob/main/LICENSE}
+For the full copyright and license information, please
+see https://github.com/yannoff/phpcc/blob/main/LICENSE

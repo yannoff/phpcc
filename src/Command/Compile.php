@@ -18,8 +18,10 @@ namespace Yannoff\PhpCodeCompiler\Command;
 use Yannoff\Component\Console\Command;
 use Yannoff\Component\Console\Definition\Option;
 use Yannoff\Component\Console\Exception\RuntimeException;
+use Yannoff\PhpCodeCompiler\Contents;
 use Yannoff\PhpCodeCompiler\Directory;
 use Yannoff\PhpCodeCompiler\PharBuilder;
+use Yannoff\PhpCodeCompiler\Syntax\PHPComment;
 
 class Compile extends Command
 {
@@ -196,10 +198,9 @@ class Compile extends Command
     {
         if (is_file($banner)) {
             $this->info("Loading banner contents from <strong>$banner</strong> file...");
-            $contents = file_get_contents($banner);
-            $header = $this->phpdocize($contents);
+            $header = $this->commentOut($banner);
 
-            $this->info($header, 'grey');
+            $this->info(implode("\n", $header), 'grey');
             $this->builder->setBanner($header);
         }
 
@@ -262,27 +263,24 @@ class Compile extends Command
     }
 
     /**
-     * Return the contents wrapped in a comments block
+     * Return the banner file contents wrapped in a comments block
      *
-     * @param string $contents
+     * @param string $banner Path to the banner file
      *
-     * @return string
+     * @return string[]
      */
-    protected function phpdocize(string $contents): string
+    protected function commentOut(string $banner): array
     {
-        $lines = array_map(
-            function($line) { return sprintf(' * %s', $line); },
-            explode("\n", $contents)
-        );
-
-        array_unshift($lines, '/**');
-        array_push($lines, ' */');
-
-        return implode("\n",$lines);
+        return Contents::open($banner)
+            ->prefix(PHPComment::STAR)
+            ->prepend(PHPComment::OPEN)
+            ->append(PHPComment::CLOSE)
+            ->all()
+        ;
     }
 
     /**
-     * Print a message to STDERR, optionally encapsuled by styling tags
+     * Print a message to STDERR, optionally encapsulated by styling tags
      *
      * @param string $message
      * @param string $tag
