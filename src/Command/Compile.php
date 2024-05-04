@@ -18,6 +18,7 @@ namespace Yannoff\PhpCodeCompiler\Command;
 use Yannoff\Component\Console\Command;
 use Yannoff\Component\Console\Definition\Option;
 use Yannoff\Component\Console\Exception\RuntimeException;
+use Yannoff\Component\Console\IO\Output\Verbosity;
 use Yannoff\PhpCodeCompiler\Contents;
 use Yannoff\PhpCodeCompiler\Directory;
 use Yannoff\PhpCodeCompiler\PharBuilder;
@@ -37,6 +38,7 @@ class Compile extends Command
     {
         $this
             ->setHelp('PHP Code compiler - Phar executable compiling utility')
+            // Compiling options
             ->addOption('main', 'e', Option::VALUE, 'Set the PHAR stub\'s main entrypoint script')
             ->addOption('dir', 'd', Option::MULTI, 'Add directory contents ("-d $dir") optionally filtered on a specific file extension ("$dir:$extension")')
             ->addOption('file', 'f', Option::MULTI, 'Add a single file to the archive')
@@ -44,6 +46,8 @@ class Compile extends Command
             ->addOption('output', 'o', Option::VALUE, 'Set the compiled archive output name')
             ->addOption('banner', 'b', Option::VALUE, 'Load legal notice from the given banner file')
             ->addOption('shebang-less', '', Option::FLAG, 'Produce a stub deprived of the shebang directive')
+            // Global options
+            ->addOption('quiet', 'q', Option::FLAG, 'Set output verbosity level to INFO instead of DEBUG')
         ;
     }
 
@@ -62,6 +66,9 @@ class Compile extends Command
         $output = $this->require('output');
 
         $shebang = (!$this->getOption('shebang-less'));
+
+        $quiet = $this->getOption('quiet');
+        $this->setVerbosity($quiet ? Verbosity::INFO : Verbosity::DEBUG);
 
         $this
             ->initBuilder($main)
@@ -119,7 +126,7 @@ class Compile extends Command
     {
         $fullpath = $this->fullpath($file);
 
-        $this->info('+ ' . $file, 'grey');
+        $this->debug('+ ' . $file, 'grey');
 
         // Only minify pure PHP source files, other files such as
         // code templates for instance, should be left as-is
@@ -180,7 +187,7 @@ class Compile extends Command
         foreach ($definitions as $definition) {
             list($name, $value) = explode(':', $definition);
             $this->info("Adding <strong>$name</strong> metadata property");
-            $this->info("-> $name: $value", 'grey');
+            $this->debug("-> $name: $value", 'grey');
             $this->builder->addMetadata($name, $value);
         }
 
@@ -200,7 +207,7 @@ class Compile extends Command
             $this->info("Loading banner contents from <strong>$banner</strong> file...");
             $header = $this->commentOut($banner);
 
-            $this->info(implode("\n", $header), 'grey');
+            $this->debug(implode("\n", $header), 'grey');
             $this->builder->setBanner($header);
         }
 
@@ -282,17 +289,44 @@ class Compile extends Command
     /**
      * Print a message to STDERR, optionally encapsulated by styling tags
      *
-     * @param string $message
-     * @param string $tag
+     * @param string $message Console-flavour pre-formatted message
+     * @param int    $level   Verbosity level (defaults to ERROR)
+     * @param string $tag     Optional encapsulating style tags name
+     *
+     * @return self
+     */
+    protected function print(string $message, int $level = Verbosity::ERROR, string $tag = ''): self
+    {
+        $otag = $tag ? "<$tag>" : '';
+        $ctag = $tag ? "</$tag>" : '';
+        $this->dmesg(sprintf('%s%s%s', $otag, $message, $ctag), $level);
+
+        return $this;
+    }
+
+    /**
+     * Print an INFO message to standard error
+     *
+     * @param string $message Pre-formatted info message
+     * @param string $tag     Optional styling tag name
      *
      * @return self
      */
     protected function info(string $message, string $tag = ''): self
     {
-        $otag = $tag ? "<$tag>" : '';
-        $ctag = $tag ? "</$tag>" : '';
-        $this->error(sprintf('%s%s%s', $otag, $message, $ctag));
+        return $this->print($message, Verbosity::INFO, $tag);
+    }
 
-        return $this;
+    /**
+     * Print a DEBUG message to standard error
+     *
+     * @param string $message Pre-formatted debug message
+     * @param string $tag     Optional styling tag name
+     *
+     * @return self
+     */
+    protected function debug(string $message, string $tag = ''): self
+    {
+        return $this->print($message, Verbosity::DEBUG, $tag);
     }
 }
