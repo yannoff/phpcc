@@ -35,11 +35,9 @@ function php_strip_whitespace(string $file): string
         if (preg_match('!^(//|#[^\[]).*$!', $line)) {
             return null;
         }
-        // Prevent processing non-comment lines (eg: containing php:// or http:// uris)
-        // to be mistakenly treated as such
-        return preg_replace('!\s(//|#[^\[]).*$!', '', $line);
-        // Not working: breaks phpcc self-compiling
-        //return preg_replace('!([^:])' . '(//|#[^\[])' . '.*$!', '$1', $line);
+        // Prevent processing non-comment lines to be mistakenly treated as such
+        // eg: context uris containing "php://" or "http://", or this regexp
+        return preg_replace('!([^:(])(//|#[^\[]).*$!', '$1', $line);
     }, $lines);
 
     // Second pass: multi-line comments
