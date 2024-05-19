@@ -297,9 +297,12 @@ class Compile extends Command
      */
     protected function print(string $message, int $level = Verbosity::ERROR, string $tag = ''): self
     {
-        $otag = $tag ? "<$tag>" : '';
-        $ctag = $tag ? "</$tag>" : '';
-        $this->dmesg(sprintf('%s%s%s', $otag, $message, $ctag), $level);
+        if ($level <= Verbosity::$level) {
+            $otag = $tag ? "<$tag>" : '';
+            $ctag = $tag ? "</$tag>" : '';!
+
+            $this->write(sprintf('%s%s%s', $otag, $message, $ctag));
+        }
 
         return $this;
     }
