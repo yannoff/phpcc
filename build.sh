@@ -24,7 +24,7 @@ then
 fi
 
 # Ensure dependencies are up-to-date
-php -d error_reporting=1 offenbach install --no-dev --no-interaction --optimize-autoloader
+offenbach install --no-dev --no-interaction --optimize-autoloader | awk '!/Deprec/' | tr -d "\r"
 
 # Update version in main application bootstrap file
 sed -i "s/\$VERSION *=.*/\$VERSION = '$version';/" $main
