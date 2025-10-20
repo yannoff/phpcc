@@ -15,7 +15,7 @@
 
 error_reporting(E_ERROR & E_USER_ERROR);
 
-$VERSION = '1.2.1';
+$VERSION = '1.2.2';
 
 /**
  * BEWARE:
