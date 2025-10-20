@@ -50,5 +50,7 @@ args+=(--meta license:MIT)
 args+=(--meta author:yannoff)
 args+=(--meta copyright:yannoff)
 
-echo php -dphar.readonly=0 bin/compile.php "${args[@]}"
-php -dphar.readonly=0 bin/compile.php "${args[@]}"
+# Build, display and execute compiling command
+set -- php -dphar.readonly=0 bin/compile.php "${args[@]}"
+echo "$@"
+"$@"
