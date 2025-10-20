@@ -13,7 +13,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-error_reporting(E_ALL);
+error_reporting(E_ERROR & E_USER_ERROR);
 
 $VERSION = '1.2.1';
 
