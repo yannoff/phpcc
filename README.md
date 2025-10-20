@@ -168,9 +168,11 @@ Compile it (Oops... one Unknown File Object has not been included)
 phpcc -e bin/acme.php -f bin/acme.php -d src/ -o bin/acme
 ```
 
-Guess what ?
+Launching the `bin/acme` compiled archive should raise an error because of the missing file.
 
-If the `bin/acme` compiled archive stays in its place, it won't fail, because `lib/Ufo.php` can still be found from its point of view.
+Well...not. What happens here then ?
+
+If the `bin/acme` compiled archive stays in its place,the `lib/Ufo.php` can still be found from its point of view.
 
 ### Size too big
 
@@ -178,9 +180,9 @@ Many projects include some dev libraries, for unit test, local data seeding or c
 
 Fact is, some of those libs have **A LOT** of dependencies... Hence the `vendor` directory, which is usually included in the archive is really **HUGE**.
 
-Q: How do we remediate then ?
+Q: How to remediate then ?
 
-A: Before compiling, we ensure the `vendor` directory does not contains any dev library:
+A: Before compiling, ensure the `vendor` directory does not contains any dev library:
 
 ```
 composer install --no-dev
