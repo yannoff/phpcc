@@ -6,6 +6,11 @@ name: yannoff/phpcc
 description: 'PHP Code Compiler - Phar executables compiling utility'
 type: project
 license: MIT
+homepage: 'https://github.com/yannoff/phpcc'
+authors:
+    -
+        name: Yannoff
+        homepage: 'https://github.com/yannoff'
 config:
     sort-packages: true
 autoload:
