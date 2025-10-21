@@ -52,8 +52,11 @@ jobs:
             - name: Install dependencies (Offenbach)
               run: offenbach install
 
-            - name: Pass 1/2 - Compile (try to self-compile)
+            - name: Pass 1/3 - Compile using main PHP script
               run: php -dphar.readonly=0 bin/compile.php -d src:php -d vendor:php -e bin/compile.php -o bin/cc -b .banner
 
-            - name: Pass 2/2 - Smoke test (launch help command)
-              run: bin/cc --help
+            - name: Pass 2/3 - Compile using the executable
+              run: php -dphar.readonly=0 bin/cc -d src:php -d vendor:php -e bin/compile.php -o bin/cc2 -b .banner
+
+            - name: Pass 3/3 - Smoke test (launch help command)
+              run: bin/cc2 --help
