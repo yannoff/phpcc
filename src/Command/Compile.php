@@ -46,6 +46,7 @@ class Compile extends Command
             ->addOption('output', 'o', Option::VALUE, 'Set the compiled archive output name')
             ->addOption('banner', 'b', Option::VALUE, 'Load legal notice from the given banner file')
             ->addOption('shebang-less', '', Option::FLAG, 'Produce a stub deprived of the shebang directive')
+            ->addOption('no-minify', 'n', Option::FLAG, "Don't minify php source files")
             // Global options
             ->addOption('quiet', 'q', Option::FLAG, 'Set output verbosity level to INFO instead of DEBUG')
         ;
@@ -66,14 +67,15 @@ class Compile extends Command
         $output = $this->require('output');
 
         $shebang = (!$this->getOption('shebang-less'));
+        $min = (!$this->getOption('no-minify'));
 
         $quiet = $this->getOption('quiet');
         $this->setVerbosity($quiet ? Verbosity::INFO : Verbosity::DEBUG);
 
         $this
-            ->initBuilder($main)
-            ->addFiles($files)
-            ->addDirectories($dirs)
+            ->initBuilder($main, $min)
+            ->addFiles($files, $min)
+            ->addDirectories($dirs, $min)
             ->setNotice($banner)
             ->addMetadata($meta)
             ->publish($output, $shebang)
@@ -85,15 +87,16 @@ class Compile extends Command
      * Creates & store the Phar builder instance
      *
      * @param string $main The main entrypoint script
+     * @param bool   $min  Toggle PHP files minifying
      *
      * @return self
      */
-    protected function initBuilder(string $main): self
+    protected function initBuilder(string $main, bool $min): self
     {
         $this->info('Initializing Phar builder...');
         $this->builder = PharBuilder::create($main);
         $this->info('Adding stub entrypoint script contents...');
-        $this->addFile($main);
+        $this->addFile($main, $min);
 
         return $this;
     }
@@ -103,15 +106,16 @@ class Compile extends Command
      *
      * @param string  $directory  The directory to scan for contents
      * @param ?string $extensions Filter on extension, may be "php" or "(php|phtml)"
+     * @param bool    $min        Toggle PHP files minifying (defaults: true)
      *
      * @return int The number of added files
      */
-    protected function addDirectory(string $directory, string $extensions = null): int
+    protected function addDirectory(string $directory, string $extensions = null, bool $min = true): int
     {
         $filter = ($extensions) ? sprintf('/\.%s$/', $extensions) : '';
         $files = Directory::find($directory, $filter);
 
-        array_walk($files, function ($file) { $this->addFile($file); });
+        array_walk($files, function ($file) use ($min) { $this->addFile($file, $min); });
 
         return count($files);
     }
@@ -120,9 +124,10 @@ class Compile extends Command
      * Add a single file to the archive builder
      *
      * @param string $file A relative or absolute file path
+     * @param bool   $min  Toggle PHP files minifying
      *
      */
-    protected function addFile(string $file)
+    protected function addFile(string $file, bool $min)
     {
         $fullpath = $this->fullpath($file);
 
@@ -130,7 +135,7 @@ class Compile extends Command
 
         // Only minify pure PHP source files, other files such as
         // code templates for instance, should be left as-is
-        $minify = (pathinfo($file, PATHINFO_EXTENSION) === 'php');
+        $minify = (pathinfo($file, PATHINFO_EXTENSION) === 'php') && $min;
 
         $this->builder->addFile($fullpath, $file, $minify);
     }
@@ -139,10 +144,11 @@ class Compile extends Command
      * Add a list of directory specifications to the archive builder
      *
      * @param string[] $dirs A list of specs in the form "$dir" or "$dir:$extension"
+     * @param bool     $min  Toggle PHP files minifying
      *
      * @return self
      */
-    protected function addDirectories(array $dirs): self
+    protected function addDirectories(array $dirs, bool $min): self
     {
         foreach ($dirs as $spec) {
             list($directory, $extensions) = explode(':', $spec);
@@ -150,7 +156,7 @@ class Compile extends Command
             $wildcard = $extensions ? "*.$extensions" : 'all';
             $this->info("Scanning directory <strong>$directory</strong> for <strong>$wildcard</strong> files...");
 
-            $count = $this->addDirectory($directory, $extensions);
+            $count = $this->addDirectory($directory, $extensions, $min);
 
             $this->info("Added {$count} files.", 'grey');
         }
@@ -162,14 +168,15 @@ class Compile extends Command
      * Add a list of single files to the archive builder
      *
      * @param string[] $files A list of relative or absolute file paths
+     * @param bool     $min   Toggle PHP files minifying
      *
      * @return self
      */
-    protected function addFiles(array $files): self
+    protected function addFiles(array $files, bool $min): self
     {
         foreach ($files as $file) {
             $this->info("Adding single file <strong>$file</strong>...");
-            $this->addFile($file);
+            $this->addFile($file, $min);
         }
 
         return $this;
