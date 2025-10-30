@@ -18,6 +18,9 @@ PHP Code compiler - Phar executable compiling utility
     - [Requirements](#requirements)
     - [Quick install](#quick-install)
 - [Pitfalls](#pitfalls)
+    - [Shebang line in main script](#shebang-line-in-main-script)
+    - [Local versus compiled files](#local-versus-compiled-files)
+    - [Size too big](#size-too-big)
 - [License](#license)
 
 ## Usage
