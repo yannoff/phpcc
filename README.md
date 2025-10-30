@@ -153,6 +153,8 @@ PHP Code Compiler version 1.3.0-dev
 
 ### Local versus compiled files
 
+#### Trap 1: file missing in compiled phar but present in local working dir
+
 Let's consider the following tree (all files required by the app)
 
 ```
@@ -173,6 +175,16 @@ Launching the `bin/acme` compiled archive should raise an error because of the m
 Well...not. What happens here then ?
 
 If the `bin/acme` compiled archive stays in its place,the `lib/Ufo.php` can still be found from its point of view.
+
+#### Trap 2: different files with the same relative path
+
+Eg: 
+
+```php
+require "vendor/autoload.php"
+```
+
+TODO: explain, give workaround
 
 ### Size too big
 
