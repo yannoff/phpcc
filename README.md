@@ -19,7 +19,8 @@ PHP Code compiler - Phar executable compiling utility
     - [Quick install](#quick-install)
 - [Pitfalls](#pitfalls)
     - [Shebang line in main script](#shebang-line-in-main-script)
-    - [Local versus compiled files](#local-versus-compiled-files)
+    - [Local versus compiled files: missing file](#local-versus-compiled-files-missing-file)
+    - [Local versus compiled files: name collision](#local-versus-compiled-files-name-collision)
     - [Size too big](#size-too-big)
 - [License](#license)
 
@@ -154,9 +155,7 @@ $ bin/phpcc --version
 PHP Code Compiler version 1.3.0-dev
 ```
 
-### Local versus compiled files
-
-#### Trap 1: file missing in compiled phar but present in local working dir
+### Local versus compiled files: missing file
 
 Let's consider the following tree (all files required by the app)
 
@@ -173,7 +172,7 @@ Compile it (Oops... one Unknown File Object has not been included)
 phpcc -e bin/acme.php -f bin/acme.php -d src/ -o bin/acme
 ```
 
-##### Problem
+#### Problem
 
 Launching the `bin/acme` compiled archive should raise an error because of the missing file.
 
@@ -181,12 +180,12 @@ Well...not. What happens here then ?
 
 If the `bin/acme` compiled archive stays in its place,the `lib/Ufo.php` can still be found from its point of view.
 
-##### Solution
+#### Solution
 
 Always move the compiled executable **out** of the project's working directory before testing it.
 
 
-#### Trap 2: different files with the same relative path
+### Local versus compiled files: name collision
 
 Eg: 
 
@@ -196,11 +195,11 @@ require "vendor/autoload.php"
 
 Chances are, there might be such a `vendor/autoload.php` file in the project to be compiled.
 
-##### Problem
+#### Problem
 
 From the compiled app point of view, `vendor/autoload.php` refers to a relative path in the PHAR archive.
 
-##### Workaround
+#### Workaround
 
 The phpcc execution dir (i.e the compiled project's top directory) must be added first in the include path.
 
