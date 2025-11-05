@@ -49,4 +49,16 @@ class Phar extends BuiltinPhar
     {
         return $this->offsetExists($file);
     }
+
+    /**
+     * Check whether the script is run from inside a Phar
+     *
+     * @return bool
+     */
+    static public function runsInPhar()
+    {
+        @list($protocol, $uri) = explode('://', __DIR__);
+
+        return $protocol == 'phar';
+    }
 }
