@@ -152,7 +152,9 @@ _Installing phpcc version 1.2.4 / PHP 8.0_
 ```yaml
 # ...
 jobs:
-    job1:
+    compile:
+        name: Compile source files
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -162,8 +164,14 @@ jobs:
               with:
                   php-version: 8.0
 
-            - name: Compile ACME application
-              run: phpcc -q -e bin/acme.php -d src/Acme:php -d vendor/ -f LICENSE -o bin/acme
+            - name: Install dependencies
+              run: composer install --no-dev --optimize-autoloader
+
+            - name: Create virtual version
+              run: echo $(date +"%Y-%m-%d %H:%M:%S") > ./version
+
+            - name: Compile sources
+              run: php -d phar.readonly=0 /usr/local/bin/phpcc -e bin/acme.php -d src -d vendor -f version -o bin/acme --quiet
 
             - name: Smoke test (show version)
               run: bin/acme --version
