@@ -1,0 +1,35 @@
+#
+# This file is part of the PHP Code Compiler project
+#
+# Copyright (c) Yannoff (https://github.com/yannoff)
+#
+# @project   PHP Code Compiler (yannoff/phpcc)
+# @homepage  https://github.com/yannoff/phpcc
+# @license   https://github.com/yannoff/phpcc/blob/main/LICENSE
+#
+# For the full copyright and license information, please view
+# the LICENSE file that was distributed with this source code.
+#
+
+name: Install PHP Code Compiler (phpcc)
+author: Yannoff
+description: Install PHP Environment & Download PHP Code Compiler binary (phpcc)
+
+inputs:
+    php-version:
+        description: The PHP version to install
+        required: true
+
+runs:
+    using: composite
+    steps:
+        - name: Install PHP Environment
+          uses: shivammathur/setup-php@v2
+          with:
+              php-version: ${{ inputs.php-version }}
+              coverage: none
+
+        - name: Download phpcc binary
+          id: phpcc
+          shell: bash
+          run: curl -SL -O https://github.com/yannoff/phpcc/releases/latest/download/phpcc && chmod +x ./phpcc && mv -v phpcc /usr/local/bin

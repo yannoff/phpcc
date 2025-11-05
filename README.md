@@ -17,6 +17,7 @@ PHP Code compiler - Phar executable compiling utility
 - [Install](#install)
     - [Requirements](#requirements)
     - [Quick install](#quick-install)
+    - [Github Action](#github-action)
 - [License](#license)
 
 ## Usage
@@ -134,6 +135,38 @@ _Add execution permissions to the binary_
 
 ```bash
 chmod +x ${BINDIR}/phpcc
+```
+
+### Github Action
+
+A [github action](actions/install/action.yaml) is available for integration in CI scripts.
+
+The action will install PHP (in the desired version), and the `phpcc` binary.
+
+Synopsis: use `yannoff/phpcc/actions/install@<release>`.
+
+#### Integration example
+
+_Installing phpcc version 1.2.4 / PHP 8.0_
+
+```yaml
+# ...
+jobs:
+    job1:
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install PHP & PHPCodeCompiler
+              uses: yannoff/phpcc/actions/install@1.2.4
+              with:
+                  php-version: 8.0
+
+            - name: Compile ACME application
+              run: phpcc -q -e bin/acme.php -d src/Acme:php -d vendor/ -f LICENSE -o bin/acme
+
+            - name: Smoke test (show version)
+              run: bin/acme --version
 ```
 
 ## License
