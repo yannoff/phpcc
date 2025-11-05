@@ -16,7 +16,7 @@
 // Log all errors when requiring autoloader
 error_reporting(E_ALL);
 
-$VERSION = '1.2.3';
+$VERSION = '1.2.4';
 
 /**
  * BEWARE:
