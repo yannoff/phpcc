@@ -47,6 +47,7 @@ class Compile extends Command
             ->addOption('banner', 'b', Option::VALUE, 'Load legal notice from the given banner file')
             ->addOption('shebang-less', '', Option::FLAG, 'Produce a stub deprived of the shebang directive')
             ->addOption('no-minify', 'n', Option::FLAG, "Don't minify php source files")
+            ->addOption('debug', '', Option::FLAG, 'Turn on debugging mode (increase verbosity and error_reporting level)')
             // Global options
             ->addOption('quiet', 'q', Option::FLAG, 'Set output verbosity level to INFO instead of DEBUG')
         ;
@@ -57,6 +58,13 @@ class Compile extends Command
      */
     public function execute()
     {
+        $debug = $this->getOption('debug');
+
+        // In debug mode, catch and log all errors
+        if ($debug) {
+            error_reporting(E_ALL);
+        }
+
         $banner = $this->getOption('banner') ?? '';
 
         $dirs = $this->getOption('dir') ?? [];
