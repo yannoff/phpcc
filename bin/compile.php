@@ -13,7 +13,8 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-error_reporting(E_ERROR & E_USER_ERROR);
+// Log all errors when requiring autoloader
+error_reporting(E_ALL);
 
 $VERSION = '1.2.3';
 
@@ -32,6 +33,12 @@ require 'vendor/autoload.php';
 
 use Yannoff\Component\Console\Application;
 use Yannoff\PhpCodeCompiler\Command\Compile;
+use Yannoff\PhpCodeCompiler\Phar;
+
+// If the script is executed from the compiled phar, lower error log level
+if (Phar::runsInPhar()) {
+    error_reporting(E_ERROR & E_USER_ERROR);
+}
 
 $app = new Application('PHP Code Compiler', $VERSION, (new Compile()));
 $app->run();
