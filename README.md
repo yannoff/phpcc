@@ -36,6 +36,7 @@ phpcc \
     [-f <file> [-f <file> ...]] \
     [-b <banner>] \
     [-m <metadata> [-m <metadata> ...]]
+    [--debug]
 ```
 
 ### Options/Arguments
@@ -52,6 +53,7 @@ Name /  Shorthand   |  Type | Description                                       
 `--meta`, `-m`      | multi | Adds a metadata to the archive<br/>_Metadata must be specified in the `$key:$value` format_                                                                                             |n
 `--no-minify`, `-n` | flag  | Don't minify PHP source files<br/>_Useful for debugging the compiled executable in case of runtime errors_                                                                              |n
 `--shebang-less`    | flag  | Produce a stub deprived of the shebang directive<br/>_Useful when the phar is meant to be included instead of being executed directly_                                                  |n
+`--debug`           | flag  | Turn on debug mode<br/>*Set php error reporting level to `E_ALL` at compilation time*                                                                                                   |n
 `--quiet`, `-q`     | flag  | Reduce output messages amount: set verbosity level to `INFO` instead of default `DEBUG`                                                                                                 |n
 
 
