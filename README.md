@@ -17,6 +17,7 @@ PHP Code compiler - Phar executable compiling utility
 - [Install](#install)
     - [Requirements](#requirements)
     - [Quick install](#quick-install)
+    - [Bash completion](#bash-completion)
     - [Github Action](#github-action)
 - [License](#license)
 
@@ -135,6 +136,18 @@ _Add execution permissions to the binary_
 
 ```bash
 chmod +x ${BINDIR}/phpcc
+```
+
+### Bash completion
+
+A [bash completion script](/etc/bash_completion.d/phpcc-completion) is also available.
+
+```bash
+# Download the bash completion script
+curl -Lo ${BINDIR}/phpcc https://github.com/yannoff/phpcc/releases/latest/download/phpcc-completion
+
+# Add the script to bash completion directory
+sudo mv phpcc-completion /etc/bash_completion.d/phpcc-completion
 ```
 
 ### Github Action
