@@ -144,7 +144,7 @@ A [bash completion script](/etc/bash_completion.d/phpcc-completion) is also avai
 
 ```bash
 # Download the bash completion script
-curl -Lo ${BINDIR}/phpcc https://github.com/yannoff/phpcc/releases/latest/download/phpcc-completion
+curl -LO https://github.com/yannoff/phpcc/releases/latest/download/phpcc-completion
 
 # Add the script to bash completion directory
 sudo mv phpcc-completion /etc/bash_completion.d/phpcc-completion
