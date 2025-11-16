@@ -45,9 +45,18 @@ __comp_phpcc_command(){
     options+=( shebang-less )
 
     case "${prev}" in
-        --banner|--dir|--file|--main|--output)
-            # if a previous typed option expects a file or directory path,
-            # let the reply empty so that readline's default completion is used
+        # previous typed option expects a file path
+        --banner|--file|--main|--output)
+            compgen -d -f ${cur}
+        ;;
+
+        # previous typed option expects a directory path
+        --dir)
+            compgen -d ${cur}
+        ;;
+
+        # previous typed option is not elligible to completion
+        --meta)
         ;;
 
         *)
@@ -61,4 +70,4 @@ __comp_phpcc_command(){
         ;;
     esac
 }
-complete -o default -C __comp_phpcc_command phpcc
+complete -C __comp_phpcc_command phpcc
