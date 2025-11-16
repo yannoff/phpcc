@@ -1,0 +1,64 @@
+#!/bin/bash
+
+#
+# This file is part of the PHP Code Compiler project
+#
+# Copyright (c) Yannoff (https://github.com/yannoff)
+#
+# @project   PHP Code Compiler (yannoff/phpcc)
+# @homepage  https://github.com/yannoff/phpcc
+# @license   https://github.com/yannoff/phpcc/blob/main/LICENSE
+#
+# For the full copyright and license information, please view
+# the LICENSE file that was distributed with this source code.
+#
+
+#
+# Remove - or -- prefix from an option name beginning
+#
+# args:
+# $1: the raw option name (eg: "-op" or "--long-o")
+#
+__trim(){ local w=$1; if [ "${w:0:2}" = "--" ]; then echo ${w:2}; elif [ "${w:0:1}" = "-" ]; then echo ${w:1}; else echo ${w}; fi }
+
+#
+# PHP Code Compiler bash completion command
+#
+# args:
+# $1: the command word
+# $2: the current word
+# $3: the previous word
+#
+__comp_phpcc_command(){
+    local prev=$3 cur=$2 options=()
+
+    options+=( banner )
+    options+=( debug )
+    options+=( dir )
+    options+=( file )
+    options+=( help )
+    options+=( main )
+    options+=( meta )
+    options+=( no-minify )
+    options+=( output )
+    options+=( quiet )
+    options+=( shebang-less )
+
+    case "${prev}" in
+        --banner|--dir|--file|--main|--output)
+            # if a previous typed option expects a file or directory path,
+            # let the reply empty so that readline's default completion is used
+        ;;
+
+        *)
+            case "$cur" in
+                -*|"")
+                    # If comp word is empty or starts with a minus sign,
+                    # then use the long options list for completion
+                    compgen -W "${options[*]}"  -P -- $(__trim ${cur})
+                ;;
+            esac
+        ;;
+    esac
+}
+complete -o default -C __comp_phpcc_command phpcc
