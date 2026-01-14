@@ -19,6 +19,11 @@ PHP Code compiler - Phar executable compiling utility
     - [Quick install](#quick-install)
     - [Bash completion](#bash-completion)
     - [Github Action](#github-action)
+- [Pitfalls](#pitfalls)
+    - [Shebang line in main script](#shebang-line-in-main-script)
+    - [Local versus compiled files: missing file](#local-versus-compiled-files-missing-file)
+    - [Local versus compiled files: name collision](#local-versus-compiled-files-name-collision)
+    - [Size too big](#size-too-big)
 - [License](#license)
 
 ## Usage
@@ -189,6 +194,100 @@ jobs:
             - name: Smoke test (show version)
               run: bin/acme --version
 ```
+
+## Pitfalls
+
+Here is a (non-exhaustive) list of the most common mistakes related to PHAR compiling.
+
+### Shebang line in main script
+
+Since the main (entrypoint) script will be **included** in the PHAR stub, it must not contain any shebang line, otherwise this line will be treated as text and printed to standard output when invoking the compiled PHAR.
+
+_Example: Invoking a version of `phpcc` compiled with a shebang line in `bin/compile.php`_
+
+```
+$ bin/phpcc --version
+#!/usr/bin/env php
+PHP Code Compiler version 1.3.0-dev
+```
+
+### Local versus compiled files: missing file
+
+Let's consider the following tree (all files required by the app)
+
+```
+bin/acme.php
+src/Command/Acme.php
+src/Command/SomeClass.php
+lib/Ufo.php
+```
+
+Compile it (Oops... one Unknown File Object has not been included)
+
+```
+phpcc -e bin/acme.php -f bin/acme.php -d src/ -o bin/acme
+```
+
+#### Problem
+
+Launching the `bin/acme` compiled archive should raise an error because of the missing file.
+
+Well...not. What happens here then ?
+
+If the `bin/acme` compiled archive stays in its place,the `lib/Ufo.php` can still be found from its point of view.
+
+#### Solution
+
+Always move the compiled executable **out** of the project's working directory before testing it.
+
+
+### Local versus compiled files: name collision
+
+Eg: 
+
+```php
+require "vendor/autoload.php"
+```
+
+Chances are, there might be such a `vendor/autoload.php` file in the project to be compiled.
+
+#### Problem
+
+From the compiled app point of view, `vendor/autoload.php` refers to a relative path in the PHAR archive.
+
+#### Workaround
+
+The phpcc execution dir (i.e the compiled project's top directory) must be added first in the include path.
+
+For example in the main entrypoint script:
+
+```php
+// bin/main.php
+
+// ensure we load the execution directory's autoload, not the
+// one included in the compiled phar executable
+set_include_path(getcwd() . PATH_SEPARATOR . get_include_path());
+
+require 'vendor/autoload.php';
+
+// ...
+```
+
+### Size too big
+
+Many projects include some dev libraries, for unit test, local data seeding or code inspection.
+
+Fact is, some of those libs have **A LOT** of dependencies... Hence the `vendor` directory, which is usually included in the archive is really **HUGE**.
+
+Q: How to remediate then ?
+
+A: Before compiling, ensure the `vendor` directory does not contains any dev library:
+
+```
+composer install --no-dev
+phpcc -e bin/acme.php -f bin/acme.php -d src/:php -d vendor:php -d vendor:yaml -o bin/acme
+```
+
 
 ## License
 
